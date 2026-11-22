@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Launch Radar — comps-odds v1</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header>
+  <h1>Token Launch Radar</h1>
+  <p class="sub">Which pre-token protocol would be worth the most if it launched — and how to farm it. Snapshot: DefiLlama, <span id="asof"></span>. Model: <strong>comps-odds v1</strong>. <span id="counts"></span></p>
+  <nav>
+    <button id="tab-board" class="tab active">Board</button>
+    <button id="tab-live" class="tab">Live tokens</button>
+    <button id="tab-model" class="tab">Model &amp; method</button>
+  </nav>
+</header>
+<main>
+  <section id="view-board">
+    <div class="controls">
+      <input id="q" type="search" placeholder="Search name or slug" aria-label="Search">
+      <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+      <select id="sort" aria-label="Sort">
+        <option value="rank">Sort: rank</option>
+        <option value="implied">Sort: implied value</option>
+        <option value="tvl">Sort: TVL</option>
+        <option value="growth">Sort: 7-day change</option>
+      </select>
+      <label class="check"><input id="wl" type="checkbox"> Watchlist only</label>
+    </div>
+    <p id="result-count" class="muted"></p>
+    <table>
+      <thead><tr><th>#</th><th>Protocol</th><th>Category</th><th>Chains</th><th>TVL</th><th>7d</th><th>Comp</th><th>Odds</th><th>Implied value</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="muted">Click a row for the value breakdown, the farm plan and the doubts. Implied value is this entry's claim, not a prediction that a token will launch.</p>
+  </section>
+  <section id="view-live" hidden>
+    <h2>Live tokens — the market's own values</h2>
+    <p>Protocols whose token already trades, by market cap. They are not ranked: a launch radar ranks what does not exist yet. Shown so the board's comps can be checked against real prices.</p>
+    <table>
+      <thead><tr><th>Protocol</th><th>Category</th><th>TVL</th><th>Market cap</th><th>mcap / TVL</th><th>7d</th></tr></thead>
+      <tbody id="live-rows"></tbody>
+    </table>
+  </section>
+  <section id="view-model" hidden>
+    <h2>Model &amp; method — comps-odds v1</h2>
+    <p><strong>implied = TVL × comp × odds × growth</strong></p>
+    <ul>
+      <li><strong>comp</strong> — the category's median market-cap/TVL among its token-bearing protocols (5 or more peers, else the global median 0.241), clamped to 0.05–0.60. A launch is priced like its peers.</li>
+      <li><strong>odds</strong> — the category's token rate (share of protocols in the category that already record a token), clamped to 0.20–0.80, times a maturity factor 0.70–1.00 over four years of tracking. Unknown age counts as 365 days.</li>
+      <li><strong>growth</strong> — 1 + clamped 7-day TVL change (−50%…+100%) × 0.5.</li>
+    </ul>
+    <h3>What counts as a launch</h3>
+    <p>A protocol is ranked only if it records no token <em>and</em> is not a wrapped, staked or bridged product of a token that already trades: no Bridge, Canonical Bridge, Liquid Staking, Liquid Restaking, Restaked BTC or CEX category, no wrapped/staked/staking name, no exchange prefix, no version marker. That is the house watchlist's own rule, applied to all 198 ranked rows. WBTC, Binance staked ETH and USDT0 are never ranked as launches.</p>
+    <h3>Model sandbox — change the assumptions, watch the board move</h3>
+    <div class="sandbox">
+      <label>Growth weight <span id="gw-val">0.50</span><input id="gw" type="range" min="0" max="1" step="0.05" value="0.5"></label>
+      <label>Comp cap <span id="cc-val">0.60</span><input id="cc" type="range" min="0.3" max="0.8" step="0.05" value="0.6"></label>
+      <label>Odds floor <span id="of-val">0.20</span><input id="of" type="range" min="0.1" max="0.4" step="0.05" value="0.2"></label>
+      <button id="sandbox-reset">Reset</button>
+    </div>
+    <p id="sandbox-top" class="muted"></p>
+    <h3>Limits — read before trusting the board</h3>
+    <ul>
+      <li>The snapshot is frozen at 14 Nov 2026. Nothing after that date is in it.</li>
+      <li>Market cap here is circulating market cap, not fully diluted value; comps inherit that.</li>
+      <li>The category token rate is a crude proxy for launch odds. It says nothing about a team's plans.</li>
+      <li>“Records no token” means DefiLlama records none — a protocol may still have one.</li>
+      <li>Farm plans are generic by category, not advice. Never pay to claim an airdrop.</li>
+    </ul>
+  </section>
+  <aside id="detail" hidden></aside>
+</main>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
